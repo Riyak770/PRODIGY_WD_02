@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #stopwatch {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        #laps {
+            margin-top: 20px;
+        }
+        #laps li {
+            list-style: none;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        #laps li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Stopwatch</h1>
+    <div id="stopwatch">00:00:00</div>
+    <button id="start-btn">Start</button>
+    <button id="pause-btn" disabled>Pause</button>
+    <button id="reset-btn" disabled>Reset</button>
+    <button id="lap-btn" disabled>Lap</button>
+    <ul id="laps"></ul>
+
+    <script>
+        let startTime = 0;
+        let endTime = 0;
+        let currentTime = 0;
+        let intervalId = 0;
+        let isRunning = false;
+        let laps = [];
+
+        document.getElementById('start-btn').addEventListener('click', start);
+        document.getElementById('pause-btn').addEventListener('click', pause);
+        document.getElementById('reset-btn').addEventListener('click', reset);
+        document.getElementById('lap-btn').addEventListener('click', lap);
+
+        function start() {
+            startTime = new Date().getTime();
+            intervalId = setInterval(updateTime, 10);
+            isRunning = true;
+            document.getElementById('start-btn').disabled = true;
+            document.getElementById('pause-btn').disabled = false;
+            document.getElementById('reset-btn').disabled = false;
+            document.getElementById('lap-btn').disabled = false;
+        }
+
+        function pause() {
+            endTime = new Date().getTime();
+            clearInterval(intervalId);
+            isRunning = false;
+            document.getElementById('start-btn').disabled = false;
+            document.getElementById('pause-btn').disabled = true;
+        }
+
+        function reset() {
+            startTime = 0;
+            endTime = 0;
+            currentTime = 0;
+            laps = [];
+            document.getElementById('stopwatch').innerHTML = '00:00:00';
+            document.getElementById('laps').innerHTML = '';
+            document.getElementById('start-btn').disabled = false;
+            document.getElementById('pause-btn').disabled = true;
+            document.getElementById('reset-btn').disabled = true;
+            document.getElementById('lap-btn').disabled = true;
+        }
+
+        function lap() {
+            let lapTime = formatTime(currentTime);
+            laps.push(lapTime);
+            let lapHtml = '';
+            for (let i = 0; i < laps.length; i++) {
+                lapHtml += `<li>Lap ${i + 1}: ${laps[i]}</li>`;
+            }
+            document.getElementById('laps').innerHTML = lapHtml;
+        }
+
+        function updateTime() {
+            currentTime = new Date().getTime() - startTime;
+            document.getElementById('stopwatch').innerHTML = formatTime(currentTime);
+        }
+
+        function formatTime(time) {
+            let hours = Math.floor(time / 3600000);
+            let minutes = Math.floor((time % 3600000) / 60000);
+            let seconds = Math.floor((time % 60000) / 1000);
+            let milliseconds = time % 1000;
+            return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}.${pad(milliseconds, 3)}`;
+        }
+
+        function pad(number, length = 2) {
+            return String(number).padStart(length, '0');
+        }
+    </script>
+</body>
+</html>
